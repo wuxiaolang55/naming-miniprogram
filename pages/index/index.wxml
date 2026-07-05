@@ -1,0 +1,175 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-icon">👶</view>
+    <view class="header-title">智能起名</view>
+    <view class="header-desc">根据姓氏、性别、五行生成寓意美好的名字</view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-card">
+    <!-- 姓氏输入 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-icon">📝</text>
+        <text>姓氏</text>
+      </view>
+      <input 
+        class="form-input" 
+        placeholder="请输入姓氏（如：张、李、王）" 
+        value="{{surname}}"
+        bindinput="onSurnameInput"
+        maxlength="2"
+      />
+      <view class="surname-info" wx:if="{{surnameInfo}}">
+        <text>{{surnameInfo}}</text>
+      </view>
+    </view>
+
+    <!-- 性别选择 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-icon">👤</text>
+        <text>性别</text>
+      </view>
+      <view class="gender-selector">
+        <view 
+          class="gender-option {{gender === 'male' ? 'active' : ''}}" 
+          bindtap="onGenderSelect" 
+          data-gender="male"
+        >
+          <text class="gender-icon">👦</text>
+          <text>男孩</text>
+        </view>
+        <view 
+          class="gender-option {{gender === 'female' ? 'active' : ''}}" 
+          bindtap="onGenderSelect" 
+          data-gender="female"
+        >
+          <text class="gender-icon">👧</text>
+          <text>女孩</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 出生日期 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-icon">📅</text>
+        <text>出生日期</text>
+        <text class="label-optional">（可选，用于五行分析）</text>
+      </view>
+      <picker 
+        mode="date" 
+        value="{{birthDate}}" 
+        start="1990-01-01" 
+        end="2030-12-31" 
+        bindchange="onDateChange"
+      >
+        <view class="date-picker {{birthDate ? '' : 'placeholder'}}">
+          <text>{{birthDate || '点击选择出生日期'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 生成数量 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-icon">🔢</text>
+        <text>生成数量</text>
+      </view>
+      <view class="count-selector">
+        <view 
+          class="count-option {{count === 5 ? 'active' : ''}}" 
+          bindtap="onCountSelect" 
+          data-count="5"
+        >5个</view>
+        <view 
+          class="count-option {{count === 10 ? 'active' : ''}}" 
+          bindtap="onCountSelect" 
+          data-count="10"
+        >10个</view>
+        <view 
+          class="count-option {{count === 20 ? 'active' : ''}}" 
+          bindtap="onCountSelect" 
+          data-count="20"
+        >20个</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 生成按钮 -->
+  <button class="generate-btn {{canGenerate ? '' : 'disabled'}}" bindtap="onGenerate">
+    <text wx:if="{{!generating}}">✨ 开始起名</text>
+    <text wx:else>生成中...</text>
+  </button>
+
+  <!-- 结果区域 -->
+  <view class="result-section" wx:if="{{names.length > 0}}">
+    <view class="result-header">
+      <text class="result-title">🎉 为您生成的名字</text>
+      <text class="result-tip">点击名字可查看详情</text>
+    </view>
+    
+    <view class="name-list">
+      <view 
+        class="name-card" 
+        wx:for="{{names}}" 
+        wx:key="fullName"
+        bindtap="onNameTap"
+        data-index="{{index}}"
+      >
+        <view class="name-header">
+          <text class="name-rank">第{{index + 1}}名</text>
+          <view class="name-score">
+            <text class="score-star">⭐</text>
+            <text>{{item.score}}分</text>
+          </view>
+        </view>
+        
+        <view class="name-main">
+          <text class="name-surname">{{item.surname}}</text>
+          <text class="name-given">{{item.givenName}}</text>
+        </view>
+        
+        <view class="name-details" wx:if="{{item.meanings.length > 0}}">
+          <view class="meaning-item" wx:for="{{item.meanings}}" wx:key="char" wx:for-item="meaning">
+            <text class="meaning-char">{{meaning.char}}</text>
+            <text class="meaning-text">{{meaning.meaning}}</text>
+          </view>
+        </view>
+        
+        <view class="name-wuxing" wx:if="{{item.wuxing.length > 0}}">
+          <text class="wuxing-label">五行：</text>
+          <view class="wuxing-tags">
+            <view class="wuxing-tag {{wx.element}}" wx:for="{{item.wuxing}}" wx:key="char" wx:for-item="wx">
+              {{wx.char}}({{wx.element}})
+            </view>
+          </view>
+        </view>
+        
+        <view class="name-actions">
+          <view class="action-btn {{item.isFavorite ? 'favorited' : ''}}" catchtap="onToggleFavorite" data-index="{{index}}">
+            <text>{{item.isFavorite ? '❤️' : '🤍'}}</text>
+            <text>{{item.isFavorite ? '已收藏' : '收藏'}}</text>
+          </view>
+          <view class="action-btn" catchtap="onCopyName" data-name="{{item.fullName}}">
+            <text>📋</text>
+            <text>复制</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 五行提示 -->
+  <view class="wuxing-tip" wx:if="{{wuxingResult}}">
+    <view class="tip-icon">🔮</view>
+    <view class="tip-content">
+      <text class="tip-title">五行分析</text>
+      <text class="tip-text">根据出生日期，建议补充：{{wuxingResult.complementary.join('、')}}</text>
+    </view>
+  </view>
+</view>

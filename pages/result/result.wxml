@@ -1,0 +1,75 @@
+<!--pages/result/result.wxml-->
+<view class="container">
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{favorites.length === 0}}">
+    <view class="empty-icon">💝</view>
+    <view class="empty-title">暂无收藏</view>
+    <view class="empty-desc">在起名页面点击收藏按钮，可以保存喜欢的名字</view>
+    <navigator url="/pages/index/index" class="empty-btn">
+      去起名
+    </navigator>
+  </view>
+
+  <!-- 收藏列表 -->
+  <view class="favorite-list" wx:else>
+    <view class="list-header">
+      <text class="list-title">我的收藏</text>
+      <text class="list-count">共{{favorites.length}}个</text>
+    </view>
+
+    <view class="name-list">
+      <view 
+        class="name-card" 
+        wx:for="{{favorites}}" 
+        wx:key="fullName"
+      >
+        <view class="name-header">
+          <view class="name-main">
+            <text class="name-surname">{{item.surname}}</text>
+            <text class="name-given">{{item.givenName}}</text>
+          </view>
+          <view class="name-score">
+            <text class="score-star">⭐</text>
+            <text>{{item.score}}分</text>
+          </view>
+        </view>
+        
+        <view class="name-details" wx:if="{{item.meanings.length > 0}}">
+          <view class="meaning-item" wx:for="{{item.meanings}}" wx:key="char" wx:for-item="meaning">
+            <text class="meaning-char">{{meaning.char}}</text>
+            <text class="meaning-text">{{meaning.meaning}}</text>
+          </view>
+        </view>
+        
+        <view class="name-wuxing" wx:if="{{item.wuxing.length > 0}}">
+          <text class="wuxing-label">五行：</text>
+          <view class="wuxing-tags">
+            <view class="wuxing-tag {{wx.element}}" wx:for="{{item.wuxing}}" wx:key="char" wx:for-item="wx">
+              {{wx.char}}({{wx.element}})
+            </view>
+          </view>
+        </view>
+
+        <view class="name-time">
+          收藏于：{{item.favoriteTimeStr}}
+        </view>
+        
+        <view class="name-actions">
+          <view class="action-btn" bindtap="onCopyName" data-name="{{item.fullName}}">
+            <text>📋</text>
+            <text>复制</text>
+          </view>
+          <view class="action-btn danger" bindtap="onRemoveFavorite" data-index="{{index}}" data-name="{{item.fullName}}">
+            <text>🗑️</text>
+            <text>删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 清空按钮 -->
+    <view class="clear-all" bindtap="onClearAll">
+      清空全部收藏
+    </view>
+  </view>
+</view>
