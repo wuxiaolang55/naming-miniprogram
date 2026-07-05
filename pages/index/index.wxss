@@ -7,6 +7,24 @@
   min-height: 100vh;
 }
 
+/* 收藏入口 */
+.fav-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #FFE4E4, #FFF0F0);
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+  margin-bottom: 20rpx;
+  font-size: 28rpx;
+  color: #FF4D4F;
+}
+
+.fav-arrow {
+  font-size: 32rpx;
+  opacity: 0.6;
+}
+
 /* 头部 */
 .header {
   text-align: center;

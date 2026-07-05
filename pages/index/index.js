@@ -18,6 +18,13 @@ Page({
     // 页面加载
   },
 
+  // 跳转到收藏页
+  goToFavorites() {
+    wx.navigateTo({
+      url: '/pages/result/result'
+    })
+  },
+
   // 姓氏输入
   onSurnameInput(e) {
     const surname = e.detail.value
